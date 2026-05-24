@@ -812,11 +812,12 @@ SELECT
             {
                 using (SqlConnection conn = new SqlConnection(connectionString))
                 {
-                    string query = "INSERT INTO Projects (GroupID, Title, Description) VALUES (@GID, @Title, @Desc)";
+                    string query = "INSERT INTO Projects (GroupID, Title, Description, Deadline) VALUES (@GID, @Title, @Desc, @Dl)";
                     SqlCommand cmd = new SqlCommand(query, conn);
                     cmd.Parameters.AddWithValue("@GID", cbSelectGroup.SelectedValue.ToString());
                     cmd.Parameters.AddWithValue("@Title", txtProjectTitle.Text.Trim());
                     cmd.Parameters.AddWithValue("@Desc", txtProjectDesc.Text.Trim());
+                    cmd.Parameters.AddWithValue("@Dl", dtpDeadline.Value);
 
                     await conn.OpenAsync();
                     await cmd.ExecuteNonQueryAsync();

@@ -78,6 +78,7 @@ namespace semester_project
         private System.Windows.Forms.ComboBox cbSelectGroup;
         private System.Windows.Forms.TextBox txtProjectTitle;
         private System.Windows.Forms.TextBox txtProjectDesc;
+        private System.Windows.Forms.DateTimePicker dtpDeadline;
         private System.Windows.Forms.Button btnAssignProject;
         private System.Windows.Forms.Label lblScopeGuidanceText;
 
@@ -456,10 +457,13 @@ namespace semester_project
             lblScopeGuidanceText = new Label { Text = "Provide a concise objective and key deliverables.", Location = new System.Drawing.Point(formX, startY + 260), Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Italic), ForeColor = System.Drawing.Color.DimGray, AutoSize = true };
             this.tabProjects.Controls.Add(lblScopeGuidanceText);
 
-            btnAssignProject = new Button { Text = "Allocate Project Specification", Location = new System.Drawing.Point(formX, startY + 320), Size = new System.Drawing.Size(360, 40), BackColor = System.Drawing.Color.FromArgb(142, 68, 173), ForeColor = System.Drawing.Color.White, FlatStyle = FlatStyle.Flat };
+            CreateFieldLabel(tabProjects, "Target Delivery Submission Deadline:", formX, startY + 285);
+            dtpDeadline = new DateTimePicker { Location = new System.Drawing.Point(formX, startY + 310), Size = new System.Drawing.Size(360, 28) };
+
+            btnAssignProject = new Button { Text = "Allocate Project Specification", Location = new System.Drawing.Point(formX, startY + 360), Size = new System.Drawing.Size(360, 40), BackColor = System.Drawing.Color.FromArgb(142, 68, 173), ForeColor = System.Drawing.Color.White, FlatStyle = FlatStyle.Flat };
             btnAssignProject.Click += new System.EventHandler(this.btnAssignProject_Click);
 
-            this.tabProjects.Controls.AddRange(new Control[] { cbSelectGroup, btnAssignProject });
+            this.tabProjects.Controls.AddRange(new Control[] { cbSelectGroup, dtpDeadline, btnAssignProject });
         }
 
         private void InitializeAssignAdvisorsTab()
