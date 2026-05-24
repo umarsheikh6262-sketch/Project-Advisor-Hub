@@ -1,0 +1,13 @@
+# Visual Studio build and cache folders
+.vs/
+[Bb]in/
+[Oo]bj/
+
+# NuGet Packages
+packages/
+
+# User-specific files
+*.suo
+*.user
+*.userosscache
+*.sln.docstates

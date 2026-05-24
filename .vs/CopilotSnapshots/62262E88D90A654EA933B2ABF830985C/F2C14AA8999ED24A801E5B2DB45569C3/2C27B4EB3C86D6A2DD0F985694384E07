@@ -1,0 +1,131 @@
+﻿namespace semester_project
+{
+    partial class Form1
+    {
+        private System.ComponentModel.IContainer components = null;
+        private System.Windows.Forms.Label lblIntro;
+        private System.Windows.Forms.Button btnStart;
+
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing && (components != null))
+            {
+                components.Dispose();
+            }
+            base.Dispose(disposing);
+        }
+
+        #region Windows Form Designer generated code
+        private void InitializeComponent()
+        {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
+            this.lblIntro = new System.Windows.Forms.Label();
+            this.btnStart = new System.Windows.Forms.Button();
+            this.label1 = new System.Windows.Forms.Label();
+            this.tblMain = new System.Windows.Forms.TableLayoutPanel();
+            this.flpButton = new System.Windows.Forms.FlowLayoutPanel();
+            this.pnlOverlay = new System.Windows.Forms.Panel();
+            this.tblMain.SuspendLayout();
+            this.flpButton.SuspendLayout();
+            this.SuspendLayout();
+            // 
+            // lblIntro
+            // 
+            this.lblIntro.BackColor = System.Drawing.Color.Transparent;
+            this.lblIntro.Font = new System.Drawing.Font("Segoe UI", 12F);
+            this.lblIntro.ForeColor = System.Drawing.Color.White;
+            this.lblIntro.Name = "lblIntro";
+            this.lblIntro.TabIndex = 1;
+            this.lblIntro.Text = resources.GetString("lblIntro.Text");
+            this.lblIntro.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.lblIntro.Dock = System.Windows.Forms.DockStyle.Fill;
+            // 
+            // btnStart
+            // 
+            this.btnStart.BackColor = System.Drawing.Color.MediumSlateBlue;
+            this.btnStart.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnStart.Font = new System.Drawing.Font("Segoe UI", 14F, System.Drawing.FontStyle.Bold);
+            this.btnStart.ForeColor = System.Drawing.Color.White;
+            this.btnStart.Name = "btnStart";
+            this.btnStart.TabIndex = 2;
+            this.btnStart.Text = "Let\'s Start!";
+            this.btnStart.UseVisualStyleBackColor = false;
+            this.btnStart.Click += new System.EventHandler(this.btnStart_Click);
+            this.btnStart.MouseEnter += new System.EventHandler(this.btnStart_MouseEnter);
+            this.btnStart.MouseLeave += new System.EventHandler(this.btnStart_MouseLeave);
+            this.btnStart.Size = new System.Drawing.Size(220, 60);
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.BackColor = System.Drawing.Color.Transparent;
+            this.label1.Font = new System.Drawing.Font("Microsoft YaHei", 28.2F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label1.ForeColor = System.Drawing.Color.White;
+            this.label1.Name = "label1";
+            this.label1.TabIndex = 3;
+            this.label1.Text = "Project Advisor Hub";
+            this.label1.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.label1.Dock = System.Windows.Forms.DockStyle.Fill;
+            // 
+            // tblMain
+            // 
+            this.tblMain.ColumnCount = 1;
+            this.tblMain.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.tblMain.Controls.Add(this.label1, 0, 0);
+            this.tblMain.Controls.Add(this.lblIntro, 0, 1);
+            this.tblMain.Controls.Add(this.flpButton, 0, 2);
+            this.tblMain.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.tblMain.Location = new System.Drawing.Point(0, 0);
+            this.tblMain.Name = "tblMain";
+            this.tblMain.RowCount = 3;
+            this.tblMain.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 20F));
+            this.tblMain.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 60F));
+            this.tblMain.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 20F));
+            this.tblMain.Size = new System.Drawing.Size(1292, 704);
+            this.tblMain.TabIndex = 0;
+            // 
+            // pnlOverlay
+            // 
+            this.pnlOverlay.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.pnlOverlay.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(120))), ((int)(((byte)(0))), ((int)(((byte)(0))), ((int)(((byte)(0))))));
+            this.pnlOverlay.Name = "pnlOverlay";
+            this.pnlOverlay.TabIndex = 5;
+            // 
+            // flpButton
+            // 
+            this.flpButton.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.flpButton.FlowDirection = System.Windows.Forms.FlowDirection.RightToLeft;
+            this.flpButton.Padding = new System.Windows.Forms.Padding(0, 10, 0, 10);
+            this.flpButton.Controls.Add(this.btnStart);
+            this.flpButton.WrapContents = false;
+            this.flpButton.Name = "flpButton";
+            this.flpButton.TabIndex = 4;
+            // 
+            // Form1
+            // 
+            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
+            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.BackColor = System.Drawing.SystemColors.ButtonHighlight;
+            this.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("$this.BackgroundImage")));
+            this.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
+            this.ClientSize = new System.Drawing.Size(1292, 704);
+            this.Controls.Add(this.tblMain);
+            this.Controls.Add(this.pnlOverlay);
+            this.DoubleBuffered = true;
+            this.Name = "Form1";
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
+            this.Text = "Welcome";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Form1_FormClosing);
+            this.Load += new System.EventHandler(this.Form1_Load);
+            this.tblMain.ResumeLayout(false);
+            this.flpButton.ResumeLayout(false);
+            this.ResumeLayout(false);
+
+        }
+        #endregion
+
+        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.TableLayoutPanel tblMain;
+        private System.Windows.Forms.FlowLayoutPanel flpButton;
+    }
+}

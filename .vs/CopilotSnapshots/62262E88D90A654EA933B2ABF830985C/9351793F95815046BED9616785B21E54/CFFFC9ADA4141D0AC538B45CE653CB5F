@@ -1,0 +1,98 @@
+﻿namespace semester_project
+{
+    partial class Form1
+    {
+        private System.ComponentModel.IContainer components = null;
+        private System.Windows.Forms.Label lblIntro;
+        private System.Windows.Forms.Button btnStart;
+
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing && (components != null))
+            {
+                components.Dispose();
+            }
+            base.Dispose(disposing);
+        }
+
+        #region Windows Form Designer generated code
+        private void InitializeComponent()
+        {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
+            this.lblIntro = new System.Windows.Forms.Label();
+            this.btnStart = new System.Windows.Forms.Button();
+            this.label1 = new System.Windows.Forms.Label();
+            this.pnlCard = new System.Windows.Forms.Panel();
+            this.SuspendLayout();
+            // 
+            // lblIntro
+            // 
+            this.lblIntro.BackColor = System.Drawing.Color.Transparent;
+            this.lblIntro.Font = new System.Drawing.Font("Segoe UI", 12F);
+            this.lblIntro.ForeColor = System.Drawing.Color.Black;
+            this.lblIntro.Location = new System.Drawing.Point(136, 192);
+            this.lblIntro.Name = "lblIntro";
+            this.lblIntro.Size = new System.Drawing.Size(1100, 200);
+            this.lblIntro.TabIndex = 1;
+            this.lblIntro.Text = resources.GetString("lblIntro.Text");
+            this.lblIntro.TextAlign = System.Drawing.ContentAlignment.TopCenter;
+            // 
+            // btnStart
+            // 
+            this.btnStart.BackColor = System.Drawing.Color.FromArgb(85, 110, 230);
+            this.btnStart.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnStart.FlatAppearance.BorderSize = 0;
+            this.btnStart.Font = new System.Drawing.Font("Segoe UI", 14F, System.Drawing.FontStyle.Bold);
+            this.btnStart.ForeColor = System.Drawing.Color.White;
+            this.btnStart.Location = new System.Drawing.Point(300, 330);
+            this.btnStart.Name = "btnStart";
+            this.btnStart.Size = new System.Drawing.Size(200, 50);
+            this.btnStart.TabIndex = 2;
+            this.btnStart.Text = "Let\'s Start!";
+            this.btnStart.UseVisualStyleBackColor = false;
+            this.btnStart.Click += new System.EventHandler(this.btnStart_Click);
+            this.btnStart.MouseEnter += new System.EventHandler(this.btnStart_MouseEnter);
+            this.btnStart.MouseLeave += new System.EventHandler(this.btnStart_MouseLeave);
+            this.btnStart.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.btnStart.Anchor = System.Windows.Forms.AnchorStyles.None;
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.BackColor = System.Drawing.SystemColors.ButtonFace;
+            this.label1.Font = new System.Drawing.Font("Comic Sans MS", 28.2F, ((System.Drawing.FontStyle)((System.Drawing.FontStyle.Bold | System.Drawing.FontStyle.Italic))), System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label1.Location = new System.Drawing.Point(426, 62);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(489, 66);
+            this.label1.TabIndex = 3;
+            this.label1.Text = "Project Advisor Hub";
+            // 
+            // Form1
+            // 
+            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
+            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.BackColor = System.Drawing.SystemColors.ButtonHighlight;
+            this.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("$this.BackgroundImage")));
+            this.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
+            this.ClientSize = new System.Drawing.Size(1292, 704);
+            // Add controls into card
+            this.pnlCard.Controls.Add(this.label1);
+            this.pnlCard.Controls.Add(this.lblIntro);
+            this.pnlCard.Controls.Add(this.btnStart);
+            // Add card to form
+            this.Controls.Add(this.pnlCard);
+            this.DoubleBuffered = true;
+            this.Name = "Form1";
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
+            this.Text = "Welcome";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Form1_FormClosing);
+            this.Load += new System.EventHandler(this.Form1_Load);
+            this.ResumeLayout(false);
+            this.PerformLayout();
+
+        }
+        #endregion
+
+        private System.Windows.Forms.Label label1;
+    }
+}
