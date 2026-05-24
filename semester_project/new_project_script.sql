@@ -1,5 +1,5 @@
 
-
+create database ProjectAdvisorHub;
 -- 2. Create Student Groups Table
 -- Must be created first so students and projects can reference it.
 CREATE TABLE Groups (
@@ -72,3 +72,11 @@ CREATE TABLE GroupAdvisors (
 
 
 --User Table also exists--
+CREATE TABLE Users (
+    UserID INT NOT NULL PRIMARY KEY,
+    Username NVARCHAR(50) NOT NULL,
+    Password NVARCHAR(255) NOT NULL,
+    Role NVARCHAR(20) NOT NULL
+);
+INSERT INTO Users (UserID, Username, Password, Role)
+VALUES (1, 'admin', 'admin123', 'Admin');
