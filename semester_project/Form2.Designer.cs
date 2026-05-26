@@ -99,6 +99,7 @@
             this.tblRightInner.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
             this.tblRightInner.Size = new System.Drawing.Size(594, 594);
             this.tblRightInner.TabIndex = 0;
+            this.tblRightInner.Paint += new System.Windows.Forms.PaintEventHandler(this.tblRightInner_Paint);
             // 
             // lblHeaderTitle
             // 
@@ -186,7 +187,7 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1000, 600);
             this.Controls.Add(this.tblRoot);
-            this.MinimumSize = new System.Drawing.Size(900, 600);
+            this.MinimumSize = new System.Drawing.Size(900, 598);
             this.Name = "Form2";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "ProjectAdvisorHub - Portal Gateway";

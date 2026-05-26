@@ -1,90 +1,129 @@
-﻿using System;
+using System;
+using System.Collections.Generic;
 using System.Data;
-using System.Data.SqlClient;
 using System.Windows.Forms;
 
 namespace semester_project
 {
     public partial class Form4 : Form
     {
-        private string studentIdentifier; // Holds RollNo or Email passed from login
-        private readonly string connectionString = @"Data Source=Your Server Name;Initial Catalog=ProjectAdvisorHub;Integrated Security=True;";
+        private readonly string _studentIdentifier;
+        private string _currentGroupId;
 
         public Form4(string identifier)
         {
             InitializeComponent();
-            this.studentIdentifier = identifier;
-            LoadStudentProjectProfile();
+            this._studentIdentifier = identifier;
+            this.WindowState = FormWindowState.Maximized;
         }
 
-        private void LoadStudentProjectProfile()
+        private void Form4_Load(object sender, EventArgs e)
         {
-            // Query 1: Fetch Project Details & Advisor Information
-            string projectQuery = @"
+            LoadStudentDashboardData();
+        }
+
+        private void LoadStudentDashboardData()
+        {
+            var parameters = new Dictionary<string, object> { { "@ID", _studentIdentifier } };
+
+            // FIXED: Removed GroupAdvisors and joined Groups directly to Advisors
+            string query = @"
                 SELECT p.Title, p.Description, p.Deadline, s.GroupID, adv.Name AS AdvisorName, adv.Email AS AdvisorEmail
                 FROM Students s
                 LEFT JOIN Projects p ON s.GroupID = p.GroupID
-                LEFT JOIN GroupAdvisors ga ON s.GroupID = ga.GroupID
-                LEFT JOIN Advisors adv ON ga.AdvisorID = adv.AdvisorID
-                WHERE s.RollNo = @Identifier OR s.Email = @Identifier;";
-
-            // Query 2: Fetch peer group members working on the same project
-            string teamQuery = @"
-                SELECT RollNo, Name, Program, Email 
-                FROM Students 
-                WHERE GroupID = (SELECT GroupID FROM Students WHERE RollNo = @Identifier OR Email = @Identifier)
-                  AND (RollNo != @Identifier AND Email != @Identifier);"; // Excludes current logged-in user
+                LEFT JOIN Groups g ON s.GroupID = g.GroupID
+                LEFT JOIN Advisors adv ON g.AdvisorID = adv.AdvisorID
+                WHERE s.RollNo = @ID OR s.Email = @ID";
 
             try
             {
-                using (SqlConnection conn = new SqlConnection(connectionString))
+                DataTable dt = DatabaseHelper.GetDataTable(query, parameters);
+                if (dt.Rows.Count > 0)
                 {
-                    conn.Open();
-
-                    // --- 1. Load Project & Advisor Data ---
-                    using (SqlCommand cmd = new SqlCommand(projectQuery, conn))
-                    {
-                        cmd.Parameters.Add("@Identifier", SqlDbType.NVarChar, 100).Value = studentIdentifier;
-                        using (SqlDataReader reader = cmd.ExecuteReader())
-                        {
-                            if (reader.Read())
-                            {
-                                string groupId = reader["GroupID"]?.ToString();
-                                lblGroupDisplay.Text = string.IsNullOrEmpty(groupId) ? "Not Assigned" : $"Group ID: {groupId}";
-
-                                lblProjectTitle.Text = reader["Title"] != DBNull.Value ? reader["Title"].ToString() : "No Project Assigned Yet";
-                                txtProjectDesc.Text = reader["Description"] != DBNull.Value ? reader["Description"].ToString() : "Your group hasn't been allocated a project description specification.";
-                                //lblDeadlineDisplay.Text = reader["Deadline"] != DBNull.Value ? Convert.ToDateTime(reader["Deadline"]).ToShortDateString() : "N/A";
-
-                                string advisorName = reader["AdvisorName"]?.ToString();
-                                lblAdvisorName.Text = string.IsNullOrEmpty(advisorName) ? "Unassigned Advisor" : $"Name: {advisorName}";
-                                lblAdvisorEmail.Text = reader["AdvisorEmail"] != DBNull.Value ? $"Email: {reader["AdvisorEmail"]}" : "";
-                            }
-                        }
-                    }
-
-                    // --- 2. Load Group Members into Grid View ---
-                    using (SqlCommand cmd = new SqlCommand(teamQuery, conn))
-                    {
-                        cmd.Parameters.Add("@Identifier", SqlDbType.NVarChar, 100).Value = studentIdentifier;
-                        using (SqlDataAdapter adapter = new SqlDataAdapter(cmd))
-                        {
-                            DataTable dt = new DataTable();
-                            adapter.Fill(dt);
-                            dgvGroupMembers.DataSource = dt;
-                        }
-                    }
+                    DataRow row = dt.Rows[0];
+                    _currentGroupId = row["GroupID"]?.ToString();
+                    UpdateUI(row);
+                    LoadTeamMembers();
+                    LoadSubmissionStatus();
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Error loading student portal details: {ex.Message}", "Data Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("Error loading dashboard: " + ex.Message);
             }
         }
 
-        private void StudentDashboard_FormClosed(object sender, FormClosedEventArgs e)
+        private void UpdateUI(DataRow row)
         {
-            Application.Exit(); // Prevents process lock issues
+            lblGroupDisplay.Text = string.IsNullOrEmpty(_currentGroupId) ? "No Group Assigned" : $"Group ID: {_currentGroupId}";
+            lblProjectTitle.Text = row["Title"] != DBNull.Value ? row["Title"].ToString() : "Project Not Assigned";
+            txtProjectDesc.Text = row["Description"] != DBNull.Value ? row["Description"].ToString() : "No description available.";
+            lblDeadlineDisplay.Text = row["Deadline"] != DBNull.Value ? Convert.ToDateTime(row["Deadline"]).ToShortDateString() : "N/A";
+
+            lblAdvisorName.Text = row["AdvisorName"] != DBNull.Value ? $"Name: {row["AdvisorName"]}" : "Name: Unassigned";
+            lblAdvisorEmail.Text = row["AdvisorEmail"] != DBNull.Value ? $"Email: {row["AdvisorEmail"]}" : "";
         }
+
+        private void LoadTeamMembers()
+        {
+            if (string.IsNullOrEmpty(_currentGroupId)) return;
+
+            string query = "SELECT RollNo, Name, Program, Email FROM Students WHERE GroupID = @GID AND RollNo != @ID AND Email != @ID";
+            var pars = new Dictionary<string, object> { { "@GID", _currentGroupId }, { "@ID", _studentIdentifier } };
+            dgvGroupMembers.DataSource = DatabaseHelper.GetDataTable(query, pars);
+        }
+
+        private void LoadSubmissionStatus()
+        {
+            if (string.IsNullOrEmpty(_currentGroupId)) return;
+
+            string query = "SELECT ProposalDate, DocumentationDate FROM Submissions WHERE GroupID = @GID";
+            DataTable dt = DatabaseHelper.GetDataTable(query, new Dictionary<string, object> { { "@GID", _currentGroupId } });
+
+            if (dt.Rows.Count > 0)
+            {
+                if (dt.Rows[0]["ProposalDate"] != DBNull.Value)
+                    SetStatus(lblProposalStatus, Convert.ToDateTime(dt.Rows[0]["ProposalDate"]));
+                if (dt.Rows[0]["DocumentationDate"] != DBNull.Value)
+                    SetStatus(lblDocStatus, Convert.ToDateTime(dt.Rows[0]["DocumentationDate"]));
+            }
+        }
+
+        private void SetStatus(Label lbl, DateTime date)
+        {
+            lbl.Text = "Submitted: " + date.ToString("g");
+            lbl.ForeColor = System.Drawing.Color.Green;
+        }
+
+        private void btnSubmitProposal_Click(object sender, EventArgs e) => SubmitFile("ProposalPath", "ProposalDate", lblProposalStatus);
+        private void btnSubmitDoc_Click(object sender, EventArgs e) => SubmitFile("DocumentationPath", "DocumentationDate", lblDocStatus);
+
+        private void SubmitFile(string pathCol, string dateCol, Label lbl)
+        {
+            if (string.IsNullOrEmpty(_currentGroupId))
+            {
+                MessageBox.Show("Group assignment required for submissions.");
+                return;
+            }
+
+            using (OpenFileDialog ofd = new OpenFileDialog { Filter = "PDF|*.pdf|Word|*.docx|All|*.*" })
+            {
+                if (ofd.ShowDialog() == DialogResult.OK)
+                {
+                    string checkSql = "SELECT COUNT(*) FROM Submissions WHERE GroupID=@G";
+                    int count = (int)DatabaseHelper.ExecuteScalar(checkSql, new Dictionary<string, object> { { "@G", _currentGroupId } });
+
+                    string query = count == 0
+                        ? $"INSERT INTO Submissions (GroupID, {pathCol}, {dateCol}) VALUES (@G, @P, GETDATE())"
+                        : $"UPDATE Submissions SET {pathCol}=@P, {dateCol}=GETDATE() WHERE GroupID=@G";
+
+                    DatabaseHelper.ExecuteNonQuery(query, new Dictionary<string, object> { { "@G", _currentGroupId }, { "@P", ofd.FileName } });
+                    SetStatus(lbl, DateTime.Now);
+                    MessageBox.Show("File submitted successfully!");
+                }
+            }
+        }
+
+        private void StudentDashboard_FormClosed(object sender, FormClosedEventArgs e) => Application.Exit();
     }
 }

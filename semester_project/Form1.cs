@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Drawing;
 using System.Windows.Forms;
 
@@ -9,51 +9,53 @@ namespace semester_project
         public Form1()
         {
             InitializeComponent();
-            // Wire up the FormClosing event
-            this.FormClosing += Form1_FormClosing;
-        }
-
-        // Note: Form1_Load implemented further below (handles fade-in)
-
-        private void btnStart_MouseEnter(object sender, EventArgs e)
-        {
-            btnStart.BackColor = Color.FromArgb(65, 90, 210);
-            btnStart.Cursor = Cursors.Hand;
-        }
-
-        private void btnStart_MouseLeave(object sender, EventArgs e)
-        {
-            btnStart.BackColor = Color.FromArgb(85, 110, 230);
-            btnStart.Cursor = Cursors.Default;
         }
 
         private void Form1_Load(object sender, EventArgs e)
         {
-            // Fade-in effect
+            StartFadeInEffect();
+        }
+
+        private void StartFadeInEffect()
+        {
             this.Opacity = 0;
             Timer fadeTimer = new Timer { Interval = 25 };
             fadeTimer.Tick += (s, ev) =>
             {
-                if (this.Opacity < 1) this.Opacity += 0.05;
-                else fadeTimer.Stop();
+                if (this.Opacity < 1)
+                {
+                    this.Opacity += 0.05;
+                }
+                else
+                {
+                    fadeTimer.Stop();
+                    fadeTimer.Dispose();
+                }
             };
             fadeTimer.Start();
         }
 
         private void btnStart_Click(object sender, EventArgs e)
         {
-            // We create Form2
-            Form2 roleSelection = new Form2();
-
-            // We hide Form1 so it's not visible anywhere
+            // Open login screen
+            Form2 loginForm = new Form2();
             this.Hide();
+            loginForm.Show();
 
-            // We show Form2 as a normal window (Show instead of ShowDialog)
-            roleSelection.Show();
+            // Ensure app exits when the next form is closed
+            loginForm.FormClosed += (s, args) => Application.Exit();
+        }
 
-            // IMPORTANT: We need to tell Form2 that if it closes, it should close the whole app,
-            // otherwise Form1 will stay hidden in your RAM forever.
-            roleSelection.FormClosed += (s, args) => Application.Exit();
+        private void btnStart_MouseEnter(object sender, EventArgs e)
+        {
+            btnStart.BackColor = Color.FromArgb(65, 90, 210);
+            Cursor = Cursors.Hand;
+        }
+
+        private void btnStart_MouseLeave(object sender, EventArgs e)
+        {
+            btnStart.BackColor = Color.FromArgb(85, 110, 230);
+            Cursor = Cursors.Default;
         }
 
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)

@@ -1,6 +1,5 @@
-﻿using System;
-using System.Data;
-using System.Data.SqlClient;
+using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Forms;
 
@@ -8,171 +7,133 @@ namespace semester_project
 {
     public partial class Form2 : Form
     {
-        // Placeholders text values for modern design feel
-        private const string USER_PLACEHOLDER = "Username, Roll No, or Advisor ID";
-        private const string PASS_PLACEHOLDER = "Password";
-
-        // Update Initial Catalog if your database name differs
-        private readonly string connectionString = @"Data Source=Your Server Name;Initial Catalog=ProjectAdvisorHub;Integrated Security=True;";
+        private const string UserPlaceholder = "Username, Roll No, or Advisor ID";
+        private const string PassPlaceholder = "Password";
 
         public Form2()
         {
             InitializeComponent();
-            InitializeCustomPlaceholders();
+            SetupPlaceholders();
         }
 
-        /// <summary>
-        /// Sets up the initial visual state of the placeholder styling.
-        /// </summary>
-        private void InitializeCustomPlaceholders()
+        private void SetupPlaceholders()
         {
-            txtUsername.Text = USER_PLACEHOLDER;
-            txtUsername.ForeColor = Color.Gray;
-
-            txtPassword.Text = PASS_PLACEHOLDER;
-            txtPassword.ForeColor = Color.Gray;
-            txtPassword.UseSystemPasswordChar = false;
+            SetPlaceholder(txtUsername, UserPlaceholder);
+            SetPlaceholder(txtPassword, PassPlaceholder, true);
         }
 
-        // --- Username Placeholder Logic ---
-        private void txtUsername_Enter(object sender, EventArgs e)
+        private void SetPlaceholder(TextBox textBox, string placeholder, bool isPassword = false)
         {
-            if (txtUsername.Text == USER_PLACEHOLDER)
+            textBox.Text = placeholder;
+            textBox.ForeColor = Color.Gray;
+            if (isPassword) textBox.UseSystemPasswordChar = false;
+        }
+
+        private void RemovePlaceholder(TextBox textBox, string placeholder, bool isPassword = false)
+        {
+            if (textBox.Text == placeholder)
             {
-                txtUsername.Text = "";
-                txtUsername.ForeColor = Color.FromArgb(30, 30, 30);
+                textBox.Text = "";
+                textBox.ForeColor = Color.Black;
+                if (isPassword) textBox.UseSystemPasswordChar = !chkShowPassword.Checked;
             }
         }
 
-        private void txtUsername_Leave(object sender, EventArgs e)
-        {
-            if (string.IsNullOrWhiteSpace(txtUsername.Text))
-            {
-                txtUsername.Text = USER_PLACEHOLDER;
-                txtUsername.ForeColor = Color.Gray;
-            }
-        }
+        private void txtUsername_Enter(object sender, EventArgs e) => RemovePlaceholder(txtUsername, UserPlaceholder);
+        private void txtUsername_Leave(object sender, EventArgs e) { if (string.IsNullOrWhiteSpace(txtUsername.Text)) SetPlaceholder(txtUsername, UserPlaceholder); }
 
-        // --- Password Placeholder Logic ---
-        private void txtPassword_Enter(object sender, EventArgs e)
-        {
-            if (txtPassword.Text == PASS_PLACEHOLDER)
-            {
-                txtPassword.Text = "";
-                txtPassword.ForeColor = Color.FromArgb(30, 30, 30);
-                txtPassword.UseSystemPasswordChar = !chkShowPassword.Checked;
-            }
-        }
+        private void txtPassword_Enter(object sender, EventArgs e) => RemovePlaceholder(txtPassword, PassPlaceholder, true);
+        private void txtPassword_Leave(object sender, EventArgs e) { if (string.IsNullOrWhiteSpace(txtPassword.Text)) SetPlaceholder(txtPassword, PassPlaceholder, true); }
 
-        private void txtPassword_Leave(object sender, EventArgs e)
-        {
-            if (string.IsNullOrWhiteSpace(txtPassword.Text))
-            {
-                txtPassword.Text = PASS_PLACEHOLDER;
-                txtPassword.ForeColor = Color.Gray;
-                txtPassword.UseSystemPasswordChar = false;
-            }
-        }
-
-        // --- Toggle Password Visibility Checkbox ---
         private void chkShowPassword_CheckedChanged(object sender, EventArgs e)
         {
-            if (txtPassword.Text != PASS_PLACEHOLDER)
+            if (txtPassword.Text != PassPlaceholder)
             {
                 txtPassword.UseSystemPasswordChar = !chkShowPassword.Checked;
             }
         }
 
-        // --- Core Unified Authentication Engine ---
         private void btnLogin_Click(object sender, EventArgs e)
         {
             string username = txtUsername.Text.Trim();
             string password = txtPassword.Text.Trim();
 
-            // Guard Clause: Validate text before reaching out to SQL Server
-            if (username == USER_PLACEHOLDER || password == PASS_PLACEHOLDER ||
-                string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password))
+            if (IsInputInvalid(username, password))
             {
-                MessageBox.Show("Please fill out both field credentials to log in.", "Validation Check", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show("Please enter both username and password.", "Input Required", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
 
-            string detectedRole = null;
-
-            // Secure Unified Database Scan using parameters
-            // Updated query to allow login by ID or Email for students and advisors
-            string query = @"
-                SELECT Role FROM Users WHERE Username = @InputID AND Password = @InputPass
-                UNION
-                SELECT 'STUDENT' AS Role FROM Students WHERE (RollNo = @InputID OR Email = @InputID) AND Password = @InputPass
-                UNION
-                SELECT 'ADVISOR' AS Role FROM Advisors WHERE (AdvisorID = @InputID OR Email = @InputID) AND Password = @InputPass;";
-
             try
             {
-                using (SqlConnection conn = new SqlConnection(connectionString))
+                string role = AuthenticateUser(username, password);
+                if (role != null)
                 {
-                    using (SqlCommand cmd = new SqlCommand(query, conn))
-                    {
-                        // Explicitly typing parameters to map perfectly with your database columns
-                        cmd.Parameters.Add("@InputID", SqlDbType.NVarChar, 100).Value = username;
-                        cmd.Parameters.Add("@InputPass", SqlDbType.NVarChar, 255).Value = password;
-
-                        conn.Open();
-                        object result = cmd.ExecuteScalar();
-
-                        if (result != null && result != DBNull.Value)
-                        {
-                            detectedRole = result.ToString().Trim();
-                        }
-                    }
-                }
-
-                // --- Role-Detection Router Execution ---
-                if (detectedRole != null)
-                {
-                    this.Hide();
-
-                    // String conversion normalizes variations like "Admin" vs "ADMIN" safely
-                    switch (detectedRole.ToUpper())
-                    {
-                        case "ADMIN":
-                            MessageBox.Show("Access Granted: Welcome Admin.", "System Authorization", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                            Form3 adminDashboard = new Form3();
-                            adminDashboard.Show();
-                            break;
-
-                        case "STUDENT":
-                            MessageBox.Show("Access Granted: Welcome to the Student Portal.", "System Authorization", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                            Form4 studentDashboard = new Form4(username);
-                            studentDashboard.Show();
-                            break;
-
-                        case "ADVISOR":
-                            MessageBox.Show("Access Granted: Welcome to the Advisor Workspace.", "System Authorization", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                            Form5 advisorDashboard = new Form5(username);
-                            advisorDashboard.Show();
-                            break;
-
-                        default:
-                            MessageBox.Show("Authenticated user context is invalid or corrupted.", "Context Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                            this.Show();
-                            break;
-                    }
+                    NavigateToDashboard(role, username);
                 }
                 else
                 {
-                    MessageBox.Show("Invalid identification string or password mismatch.", "Authentication Failed", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    MessageBox.Show("Invalid credentials. Please try again.", "Login Failed", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
-            }
-            catch (SqlException sqlEx)
-            {
-                MessageBox.Show($"SQL Connection Error: Could not reach target tables.\nDetails: {sqlEx.Message}", "Database Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"An explicit architecture failure occurred: {ex.Message}", "System Panic", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show($"An error occurred during login: {ex.Message}", "System Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
+        }
+
+        private bool IsInputInvalid(string user, string pass)
+        {
+            return user == UserPlaceholder || pass == PassPlaceholder || string.IsNullOrEmpty(user) || string.IsNullOrEmpty(pass);
+        }
+
+        private string AuthenticateUser(string username, string password)
+        {
+            string query = @"
+                SELECT Role FROM Users WHERE Username = @User AND Password = @Pass
+                UNION
+                SELECT 'STUDENT' FROM Students WHERE (RollNo = @User OR Email = @User) AND Password = @Pass
+                UNION
+                SELECT 'ADVISOR' FROM Advisors WHERE (AdvisorID = @User OR Email = @User) AND Password = @Pass";
+
+            var parameters = new Dictionary<string, object>
+            {
+                { "@User", username },
+                { "@Pass", password }
+            };
+
+            object result = DatabaseHelper.ExecuteScalar(query, parameters);
+            return result?.ToString()?.ToUpper();
+        }
+
+        private void NavigateToDashboard(string role, string identifier)
+        {
+            this.Hide();
+            Form dashboard = null;
+
+            switch (role)
+            {
+                case "ADMIN":
+                    dashboard = new Form3();
+                    break;
+                case "STUDENT":
+                    dashboard = new Form4(identifier);
+                    break;
+                case "ADVISOR":
+                    dashboard = new Form5(identifier);
+                    break;
+            }
+
+            if (dashboard != null)
+            {
+                dashboard.Show();
+                dashboard.FormClosed += (s, e) => Application.Exit();
+            }
+        }
+
+        private void tblRightInner_Paint(object sender, PaintEventArgs e)
+        {
+
         }
     }
 }

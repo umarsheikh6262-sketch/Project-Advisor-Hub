@@ -146,7 +146,7 @@
             this.Name = "AdvisorDashboard";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "ProjectAdvisorHub - Advisor Studio";
-            this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.AdvisorDashboard_FormClosed);
+            //this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.AdvisorDashboard_FormClosed);
             this.pnlSidebar.ResumeLayout(false);
             this.pnlSidebar.PerformLayout();
             this.pnlHeader.ResumeLayout(false);
