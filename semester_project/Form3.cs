@@ -328,11 +328,31 @@ namespace semester_project
         private async void btnCreateGroup_Click(object sender, EventArgs e)
         {
             if (string.IsNullOrWhiteSpace(txtGroupId.Text)) return;
-            try {
-                DatabaseHelper.ExecuteNonQuery("INSERT INTO Groups (GroupID) VALUES (@GID)", new Dictionary<string, object> { { "@GID", txtGroupId.Text.Trim() } });
+            string gid = txtGroupId.Text.Trim();
+            try
+            {
+                // Check existence first
+                var existsObj = DatabaseHelper.ExecuteScalar("SELECT COUNT(1) FROM Groups WHERE GroupID=@GID", new Dictionary<string, object> { { "@GID", gid } });
+                int exists = Convert.ToInt32(existsObj ?? 0);
+                if (exists > 0)
+                {
+                    MessageBox.Show("Group ID already exists.", "Duplicate", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
+                }
+
+                // Ensure GroupName is provided to satisfy NOT NULL constraint in schema
+                string gname = gid; // default GroupName same as ID; caller can update later
+
+                string insertSql = "INSERT INTO Groups (GroupID, GroupName) VALUES (@GID, @GName)";
+                DatabaseHelper.ExecuteNonQuery(insertSql, new Dictionary<string, object> { { "@GID", gid }, { "@GName", gname } });
                 txtGroupId.Clear();
                 await RefreshGroupsData();
-            } catch { MessageBox.Show("Group ID already exists."); }
+                MessageBox.Show("Group created successfully.", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error creating group: {ex.Message}", "Database Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
 
         private async void btnRemoveGroup_Click(object sender, EventArgs e)
@@ -362,9 +382,21 @@ namespace semester_project
         {
             if (cbSelectGroup.SelectedValue == null || string.IsNullOrWhiteSpace(txtProjectTitle.Text)) return;
 
+            string gid = cbSelectGroup.SelectedValue.ToString();
+
+            // Check if a project already exists for this group
+            var existsObj = DatabaseHelper.ExecuteScalar("SELECT COUNT(1) FROM Projects WHERE GroupID=@GID", new Dictionary<string, object> { { "@GID", gid } });
+            int exists = Convert.ToInt32(existsObj ?? 0);
+            if (exists > 0)
+            {
+                var res = MessageBox.Show("Selected group already has a project assigned. Assigning another will create multiple projects for the same group. Continue?", "Confirm Multiple Projects", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
+                if (res != DialogResult.Yes)
+                    return;
+            }
+
             string query = "INSERT INTO Projects (GroupID, Title, Description, Deadline) VALUES (@GID, @Title, @Desc, @Dl)";
             var pars = new Dictionary<string, object> {
-                {"@GID", cbSelectGroup.SelectedValue}, {"@Title", txtProjectTitle.Text.Trim()},
+                {"@GID", gid}, {"@Title", txtProjectTitle.Text.Trim()},
                 {"@Desc", txtProjectDesc.Text.Trim()}, {"@Dl", dtpDeadline.Value}
             };
 
